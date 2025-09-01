@@ -63,23 +63,14 @@ const PWA_CONFIG = {
 };
 
 // PWA Functions
-function createManifest() {
-    try {
-        const manifestBlob = new Blob([JSON.stringify(PWA_CONFIG, null, 2)], { type: 'application/json' });
-        const manifestURL = URL.createObjectURL(manifestBlob);
+navigator.serviceWorker.register('/service-worker.js')
+    .then(registration => {
+        console.log('Service Worker registered:', registration);
+    })
+    .catch(error => {
+        console.error('Service Worker registration failed:', error);
+    });
 
-        const manifestLink = document.getElementById('manifest-link');
-        if (manifestLink) {
-            manifestLink.href = manifestURL;
-            console.log('PWA manifest created and linked');
-        }
-    } catch (error) {
-        console.error('Error creating manifest:', error);
-    }
-}
-
-function createServiceWorker() {
-    const swCode = `
         const CACHE_NAME = 'etf-calculator-v1.0.0';
         const ASSETS_TO_CACHE = [
             './',
