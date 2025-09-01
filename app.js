@@ -181,7 +181,7 @@ navigator.serviceWorker.register('/service-worker.js')
                     console.error('Service Worker registration failed:', error);
                 });
 
-            navigator.serviceWorker.addEventListener('controllerchange', () => {
+            navigator.service-Worker.addEventListener('controllerchange', () => {
                 window.location.reload();
             });
         }
