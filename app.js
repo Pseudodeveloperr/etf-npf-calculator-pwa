@@ -36,25 +36,25 @@ const sampleData = {
     ]
 };
 
-// PWA Configuration
+// PWA Configuration - FIXED
 const PWA_CONFIG = {
     name: "ETF & NPF Calculator",
     short_name: "ETF Calculator",
     description: "Professional Early Termination & Notice Period Fee Calculator with automatic record keeping",
-    start_url: "/",
+    start_url: "./",  // FIXED: Changed from "/" to "./"
     display: "standalone",
     background_color: "#ffffff",
     theme_color: "#2563eb",
     orientation: "portrait-primary",
     icons: [
         {
-            src: "logo.jpg",
+            src: "./logo.jpg",  // FIXED: Changed from "logo.jpg" to "./logo.jpg"
             sizes: "192x192",
             type: "image/jpeg",
             purpose: "any maskable"
         },
         {
-            src: "logo.jpg",
+            src: "./logo.jpg",  // FIXED: Changed from "logo.jpg" to "./logo.jpg"
             sizes: "512x512",
             type: "image/jpeg",
             purpose: "any maskable"
@@ -67,7 +67,7 @@ function createManifest() {
     try {
         const manifestBlob = new Blob([JSON.stringify(PWA_CONFIG, null, 2)], { type: 'application/json' });
         const manifestURL = URL.createObjectURL(manifestBlob);
-        
+
         const manifestLink = document.getElementById('manifest-link');
         if (manifestLink) {
             manifestLink.href = manifestURL;
@@ -82,12 +82,12 @@ function createServiceWorker() {
     const swCode = `
         const CACHE_NAME = 'etf-calculator-v1.0.0';
         const ASSETS_TO_CACHE = [
-            '/',
-            '/index.html',
-            '/style.css',
-            '/app.js',
-            '/logo.jpg',
-            '/background.jpg'
+            './',
+            './index.html',
+            './style.css',
+            './app.js',
+            './logo.jpg'
+            // FIXED: Removed '/background.jpg' since it doesn't exist
         ];
 
         // Install event
@@ -155,7 +155,7 @@ function createServiceWorker() {
                     .catch(() => {
                         // Return cached fallback for navigation requests
                         if (event.request.destination === 'document') {
-                            return caches.match('/index.html');
+                            return caches.match('./index.html');
                         }
                     })
             );
@@ -168,16 +168,14 @@ function createServiceWorker() {
             }
         });
     `;
-    
+
     try {
-        const swBlob = new Blob([swCode], { type: 'application/javascript' });
-        const swURL = URL.createObjectURL(swBlob);
-        
+        // FIXED: Use external service worker file instead of blob URL
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register(swURL)
+            navigator.serviceWorker.register('./service-worker.js')  // FIXED: Point to actual file
                 .then((registration) => {
                     console.log('Service Worker registered successfully:', registration);
-                    
+
                     registration.addEventListener('updatefound', () => {
                         const newWorker = registration.installing;
                         newWorker.addEventListener('statechange', () => {
@@ -191,7 +189,7 @@ function createServiceWorker() {
                 .catch((error) => {
                     console.error('Service Worker registration failed:', error);
                 });
-                
+
             navigator.serviceWorker.addEventListener('controllerchange', () => {
                 window.location.reload();
             });
@@ -208,7 +206,7 @@ function setupPWAInstallation() {
         console.log('App is running in standalone mode');
         return;
     }
-    
+
     // Listen for beforeinstallprompt event
     window.addEventListener('beforeinstallprompt', (event) => {
         console.log('PWA install prompt available');
@@ -216,19 +214,19 @@ function setupPWAInstallation() {
         deferredPrompt = event;
         showInstallBanner();
     });
-    
+
     // Setup install banner interactions
     const installBtn = document.getElementById('install-btn');
     const dismissBtn = document.getElementById('dismiss-install');
-    
+
     if (installBtn) {
         installBtn.addEventListener('click', installApp);
     }
-    
+
     if (dismissBtn) {
         dismissBtn.addEventListener('click', hideInstallBanner);
     }
-    
+
     // Listen for app installed event
     window.addEventListener('appinstalled', (event) => {
         console.log('PWA was installed successfully');
@@ -236,7 +234,7 @@ function setupPWAInstallation() {
         hideInstallBanner();
         showSuccessNotification('App installed successfully! You can now use it offline.');
     });
-    
+
     // Show install banner after delay if not installed (reduced time for testing)
     setTimeout(() => {
         if (!isInstalled && !deferredPrompt) {
@@ -275,9 +273,9 @@ function installApp() {
         showSuccessNotification('To install this app, use your browser\'s "Add to Home Screen" or "Install App" option.');
         return;
     }
-    
+
     deferredPrompt.prompt();
-    
+
     deferredPrompt.userChoice.then((choiceResult) => {
         if (choiceResult.outcome === 'accepted') {
             console.log('User accepted the PWA install prompt');
@@ -292,45 +290,45 @@ function installApp() {
 // Tab switching functionality - FIXED
 function switchTab(tabId) {
     console.log('Switching to tab:', tabId);
-    
+
     try {
         // Get all tabs and content
         const tabButtons = document.querySelectorAll('.tab-btn');
         const tabContents = document.querySelectorAll('.tab-content');
-        
+
         console.log('Found tab buttons:', tabButtons.length);
         console.log('Found tab contents:', tabContents.length);
-        
+
         // Remove active class from all
         tabButtons.forEach(btn => {
             btn.classList.remove('active');
             console.log('Removed active from button:', btn.getAttribute('data-tab'));
         });
-        
+
         tabContents.forEach(content => {
             content.classList.remove('active');
             content.style.display = 'none'; // Ensure hidden
             console.log('Removed active from content:', content.id);
         });
-        
+
         // Add active class to selected elements
         const activeButton = document.querySelector(`[data-tab="${tabId}"]`);
         const activeContent = document.getElementById(`${tabId}-tab`);
-        
+
         console.log('Active button found:', !!activeButton);
         console.log('Active content found:', !!activeContent);
-        
+
         if (activeButton) {
             activeButton.classList.add('active');
             console.log('Added active to button');
         }
-        
+
         if (activeContent) {
             activeContent.classList.add('active');
             activeContent.style.display = 'block'; // Ensure visible
             console.log('Added active to content and made visible');
         }
-        
+
         console.log(`Successfully switched to ${tabId} tab`);
     } catch (error) {
         console.error('Error switching tabs:', error);
@@ -340,34 +338,34 @@ function switchTab(tabId) {
 // ETF Calculator Functions - FIXED
 function calculateETF() {
     console.log('Starting ETF calculation...');
-    
+
     try {
         // Get form data
         const formData = getETFFormData();
         console.log('ETF Form data:', formData);
-        
+
         // Validate
         if (!validateETFForm(true)) {
             console.log('ETF form validation failed');
             return;
         }
-        
+
         // Calculate
         const results = computeETF(formData);
         console.log('ETF Calculation results:', results);
-        
+
         // Display results
         displayETFResults(results, formData);
-        
+
         // Save record
         saveCalculationRecord('ETF', formData, results);
-        
+
         // Show success
         showSuccessNotification('ETF calculation completed and saved!');
-        
+
         // Clear errors
         clearErrors('etf');
-        
+
     } catch (error) {
         console.error('ETF calculation error:', error);
         showError('etf', 'Calculation error: ' + error.message);
@@ -378,13 +376,13 @@ function loadETFSample() {
     console.log('Loading ETF sample data...');
     try {
         const sample = sampleData.etf[0];
-        
+
         document.getElementById('etf-agreed-date').value = sample.agreedCeaseDate;
         document.getElementById('etf-contract-date').value = sample.contractEndDate;
         document.getElementById('etf-monthly-sell').value = sample.monthlySell;
-        
+
         console.log('ETF sample data loaded successfully');
-        
+
         // Auto calculate after short delay
         setTimeout(() => {
             calculateETF();
@@ -417,34 +415,34 @@ function clearETFForm() {
 // NPF Calculator Functions - FIXED
 function calculateNPF() {
     console.log('Starting NPF calculation...');
-    
+
     try {
         // Get form data
         const formData = getNPFFormData();
         console.log('NPF Form data:', formData);
-        
+
         // Validate
         if (!validateNPFForm(true)) {
             console.log('NPF form validation failed');
             return;
         }
-        
+
         // Calculate
         const results = computeNPF(formData);
         console.log('NPF Calculation results:', results);
-        
+
         // Display results
         displayNPFResults(results, formData);
-        
+
         // Save record
         saveCalculationRecord('NPF', formData, results);
-        
+
         // Show success
         showSuccessNotification('NPF calculation completed and saved!');
-        
+
         // Clear errors
         clearErrors('npf');
-        
+
     } catch (error) {
         console.error('NPF calculation error:', error);
         showError('npf', 'Calculation error: ' + error.message);
@@ -455,13 +453,13 @@ function loadNPFSample() {
     console.log('Loading NPF sample data...');
     try {
         const sample = sampleData.npf[0];
-        
+
         document.getElementById('npf-agreed-date').value = sample.agreedCeaseDate;
         document.getElementById('npf-request-date').value = sample.requestReceivedDate;
         document.getElementById('npf-monthly-sell').value = sample.monthlySell;
-        
+
         console.log('NPF sample data loaded successfully');
-        
+
         // Auto calculate after short delay
         setTimeout(() => {
             calculateNPF();
@@ -502,11 +500,11 @@ function saveCalculationRecord(type, formData, results) {
             formData: { ...formData },
             results: { ...results }
         };
-        
+
         calculationRecords.push(record);
         updateRecordsCounter();
         enableExportButton();
-        
+
         console.log(`${type} record saved:`, record);
     } catch (error) {
         console.error('Error saving calculation record:', error);
@@ -543,12 +541,12 @@ function exportToCSV() {
         showError('general', 'No calculation records to export');
         return;
     }
-    
+
     try {
         const csvContent = generateCSVContent();
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
-        
+
         if (link.download !== undefined) {
             const url = URL.createObjectURL(blob);
             link.setAttribute('href', url);
@@ -557,7 +555,7 @@ function exportToCSV() {
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            
+
             showSuccessNotification(`Successfully exported ${calculationRecords.length} records to CSV!`);
             console.log('CSV export completed successfully');
         }
@@ -579,9 +577,9 @@ function generateCSVContent() {
         'Result Amount',
         'Additional Data'
     ];
-    
+
     let csvContent = headers.join(',') + '\n';
-    
+
     calculationRecords.forEach(record => {
         const row = [
             record.id,
@@ -596,10 +594,10 @@ function generateCSVContent() {
                 ? `Months: ${record.results.monthsRemaining}, Days: ${record.results.daysRemaining}`
                 : `Days Between: ${record.results.daysBetween}, NPF Days: ${record.results.npfDaysRemaining}`
         ];
-        
+
         csvContent += row.map(field => `"${String(field).replace(/"/g, '""')}"`).join(',') + '\n';
     });
-    
+
     return csvContent;
 }
 
@@ -609,7 +607,7 @@ function getETFFormData() {
         const agreedCeaseDate = document.getElementById('etf-agreed-date')?.value;
         const contractEndDate = document.getElementById('etf-contract-date')?.value;
         const monthlySellStr = document.getElementById('etf-monthly-sell')?.value;
-        
+
         return {
             agreedCeaseDate: agreedCeaseDate || '',
             contractEndDate: contractEndDate || '',
@@ -626,7 +624,7 @@ function getNPFFormData() {
         const agreedCeaseDate = document.getElementById('npf-agreed-date')?.value;
         const requestReceivedDate = document.getElementById('npf-request-date')?.value;
         const monthlySellStr = document.getElementById('npf-monthly-sell')?.value;
-        
+
         return {
             agreedCeaseDate: agreedCeaseDate || '',
             requestReceivedDate: requestReceivedDate || '',
@@ -664,26 +662,26 @@ function computeETF(data) {
 
     // Step 2: Calculate from Actual ACD to Contract End Date
     const monthsRemaining = getMonthsDifference(actualACD, contractEndDate);
-    
+
     // Get the date after adding the calculated months
     const dateAfterMonths = new Date(actualACD);
     dateAfterMonths.setMonth(dateAfterMonths.getMonth() + monthsRemaining);
-    
+
     // Calculate remaining days in the contract end month
     let daysRemaining = 0;
     if (dateAfterMonths < contractEndDate) {
         daysRemaining = getDaysDifference(dateAfterMonths, contractEndDate);
     }
-    
+
     const daysInContractEndMonth = getDaysInMonth(contractEndDate);
 
     // Step 3 & 4: Calculate ETF using exact formula
     // Monthly Portion = Months Remaining × Monthly Sell Amount
     const monthlyPortion = monthsRemaining * monthlySell;
-    
+
     // Daily Portion = Days Remaining ÷ Days in Contract End Month × Monthly Sell Amount
     const dailyPortion = daysRemaining > 0 ? (daysRemaining / daysInContractEndMonth) * monthlySell : 0;
-    
+
     // Step 5: Total ETF = Monthly Portion + Daily Portion
     const totalETF = monthlyPortion + dailyPortion;
 
@@ -735,14 +733,14 @@ function computeNPF(data) {
 function getMonthsDifference(startDate, endDate) {
     const start = new Date(startDate);
     const end = new Date(endDate);
-    
+
     let months = 0;
     const current = new Date(start);
 
     while (current < end) {
         const nextMonth = new Date(current);
         nextMonth.setMonth(nextMonth.getMonth() + 1);
-        
+
         if (nextMonth <= end) {
             months++;
             current.setMonth(current.getMonth() + 1);
@@ -803,11 +801,11 @@ function displayETFResults(results, formData) {
             console.error('ETF results container not found');
             return;
         }
-        
+
         const statusHtml = results.isExpired ? 
             '<span class="status--expired">Contract Expired</span>' : 
             '<span class="status--active">Active Contract</span>';
-        
+
         resultsContainer.innerHTML = `
             <div class="result-item">
                 <span class="result-label">Contract Status:</span>
@@ -829,7 +827,7 @@ function displayETFResults(results, formData) {
                 <span class="result-label">Monthly Sell Amount:</span>
                 <span class="result-value">${formatCurrency(formData.monthlySell)}</span>
             </div>
-            
+
             <div class="live-calculation">
                 <div class="calculation-header">
                     <h4>ETF Calculation Breakdown</h4>
@@ -854,7 +852,7 @@ function displayETFResults(results, formData) {
                 </div>
             </div>
         `;
-        
+
         console.log('ETF results displayed successfully');
     } catch (error) {
         console.error('Error displaying ETF results:', error);
@@ -868,7 +866,7 @@ function displayNPFResults(results, formData) {
             console.error('NPF results container not found');
             return;
         }
-        
+
         resultsContainer.innerHTML = `
             <div class="result-item">
                 <span class="result-label">Agreed Cease Date:</span>
@@ -886,7 +884,7 @@ function displayNPFResults(results, formData) {
                 <span class="result-label">Monthly Sell Amount:</span>
                 <span class="result-value">${formatCurrency(formData.monthlySell)}</span>
             </div>
-            
+
             <div class="live-calculation">
                 <div class="calculation-header">
                     <h4>NPF Calculation Breakdown</h4>
@@ -910,14 +908,14 @@ function displayNPFResults(results, formData) {
                     </div>
                 </div>
             </div>
-            
+
             <div class="formula-display">
                 <div class="formula-title">NPF Formula:</div>
                 NPF = Monthly Sell × NPF Days Remaining ÷ 30<br>
                 <small>Where NPF Days Remaining = 30 - (Days between Request Received Date and Actual ACD)</small>
             </div>
         `;
-        
+
         console.log('NPF results displayed successfully');
     } catch (error) {
         console.error('Error displaying NPF results:', error);
@@ -1018,7 +1016,7 @@ function showSuccessNotification(message) {
             }
             notification.classList.remove('hidden');
             notification.classList.add('show');
-            
+
             setTimeout(() => {
                 notification.classList.remove('show');
                 setTimeout(() => {
@@ -1073,7 +1071,7 @@ function setupRealTimeCalculation() {
                 });
             }
         });
-        
+
         console.log('Real-time calculation setup completed');
     } catch (error) {
         console.error('Error setting up real-time calculation:', error);
@@ -1093,22 +1091,22 @@ window.exportToCSV = exportToCSV;
 // Initialize when DOM is loaded - ENHANCED
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing Enhanced PWA ETF & NPF Calculator...');
-    
+
     try {
         // Initialize PWA features
         createManifest();
         createServiceWorker();
         setupPWAInstallation();
-        
+
         // Setup real-time calculation
         setupRealTimeCalculation();
-        
+
         // Initialize records counter
         updateRecordsCounter();
-        
+
         // Initialize tab state
         switchTab('etf'); // Ensure ETF tab is active by default
-        
+
         console.log('Enhanced PWA application initialized successfully');
     } catch (error) {
         console.error('Error initializing application:', error);
