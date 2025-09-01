@@ -1,0 +1,76 @@
+{
+  "name": "ETF & NPF Calculator - Professional PWA",
+  "short_name": "ETF Calculator",
+  "description": "Professional Early Termination Fee & Notice Period Fee Calculator with automatic record keeping and offline support",
+  "version": "2.0.0",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#FCFCF9",
+  "theme_color": "#21808D",
+  "lang": "en",
+  "scope": "./",
+  "categories": ["business", "finance", "productivity"],
+  "icons": [
+    {
+      "src": "logo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "maskable"
+    },
+    {
+      "src": "logo.jpg",
+      "sizes": "512x512", 
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='20' fill='%2321808D'/%3E%3Ctext x='96' y='110' text-anchor='middle' fill='white' font-family='Arial' font-size='60' font-weight='bold'%3EE%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 540 720'%3E%3Crect width='540' height='720' fill='%23FCFCF9'/%3E%3Crect x='20' y='20' width='500' height='100' rx='10' fill='%2321808D'/%3E%3Ctext x='270' y='70' text-anchor='middle' fill='white' font-size='24' font-weight='bold'%3EETF Calculator%3C/text%3E%3C/svg%3E",
+      "sizes": "540x720",
+      "type": "image/svg+xml",
+      "form_factor": "narrow",
+      "label": "ETF Calculator - Mobile View"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "ETF Calculator",
+      "short_name": "ETF",
+      "description": "Calculate Early Termination Fees",
+      "url": "./?tab=etf",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' rx='15' fill='%2321808D'/%3E%3Ctext x='48' y='55' text-anchor='middle' fill='white' font-size='24' font-weight='bold'%3EE%3C/text%3E%3C/svg%3E",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "NPF Calculator", 
+      "short_name": "NPF",
+      "description": "Calculate Notice Period Fees",
+      "url": "./?tab=npf",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' rx='15' fill='%2332B8C6'/%3E%3Ctext x='48' y='55' text-anchor='middle' fill='white' font-size='24' font-weight='bold'%3EN%3C/text%3E%3C/svg%3E",
+          "sizes": "96x96", 
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  }
+}

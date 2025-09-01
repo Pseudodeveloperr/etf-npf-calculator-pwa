@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ETF & NPF Calculator</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#2563eb">
+    <meta name="description" content="Professional Early Termination & Notice Period Fee Calculator with automatic record keeping">
+    
+    <!-- Apple PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="ETF Calculator">
+    <link rel="apple-touch-icon" href="logo.jpg">
+    
+    <!-- Manifest will be created dynamically -->
+    <link rel="manifest" id="manifest-link">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <img src="C:\Users\ajays\Downloads\etf-npf-calculator-pwa.zip\Logo.svg" alt="Company Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="logo-placeholder" style="display: none;">LOGO</div>
+                </div>
+                <div class="header-text">
+                    <h1>ETF & NPF Calculator</h1>
+                    <p class="header__subtitle">Professional Early Termination & Notice Period Fee Calculator</p>
+                </div>
+                <div class="header-actions">
+                    <div class="records-counter">
+                        <span class="counter-label">Records: </span>
+                        <span id="records-count" class="counter-value">0</span>
+                    </div>
+                    <button class="btn btn--outline btn--sm" id="export-csv" onclick="exportToCSV()" disabled>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7,10 12,15 17,10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Export CSV
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('etf')" data-tab="etf">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                    <line x1="8" y1="21" x2="16" y2="21"/>
+                    <line x1="12" y1="17" x2="12" y2="21"/>
+                </svg>
+                ETF Calculator
+            </button>
+            <button class="tab-btn" onclick="switchTab('npf')" data-tab="npf">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 11H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h4m4-6h8a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-8m-4-6v6m4-6v6"/>
+                </svg>
+                NPF Calculator
+            </button>
+        </div>
+
+        <!-- ETF Calculator Tab -->
+        <div class="tab-content active" id="etf-tab">
+            <div class="calculator-grid">
+                <div class="input-section">
+                    <div class="card modern-card">
+                        <div class="card__body">
+                            <h3>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                    <polyline points="14,2 14,8 20,8"/>
+                                    <line x1="16" y1="13" x2="8" y2="13"/>
+                                    <line x1="16" y1="17" x2="8" y2="17"/>
+                                    <polyline points="10,9 9,9 8,9"/>
+                                </svg>
+                                ETF Calculation Input
+                            </h3>
+                            <form id="etf-form">
+                                <div class="form-group modern-form-group">
+                                    <label class="form-label modern-label" for="etf-agreed-date">Agreed Cease Date *</label>
+                                    <input type="date" id="etf-agreed-date" class="form-control modern-input" required>
+                                    <div class="input-border-effect"></div>
+                                </div>
+                                
+                                <div class="form-group modern-form-group">
+                                    <label class="form-label modern-label" for="etf-contract-date">Contract End Date *</label>
+                                    <input type="date" id="etf-contract-date" class="form-control modern-input" required>
+                                    <div class="input-border-effect"></div>
+                                </div>
+                                
+                                <div class="form-group modern-form-group">
+                                    <label class="form-label modern-label" for="etf-monthly-sell">Monthly Sell Amount (£) *</label>
+                                    <input type="number" id="etf-monthly-sell" class="form-control modern-input" step="0.01" min="0" required placeholder="0.00">
+                                    <div class="input-border-effect"></div>
+                                </div>
+                                
+                                <div class="form-actions modern-actions">
+                                    <button type="button" class="btn btn--primary modern-btn" onclick="calculateETF()">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M9 11H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h4m6-6h8a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-8m-6-6v6m6-6v6"/>
+                                        </svg>
+                                        Calculate ETF
+                                    </button>
+                                    <button type="button" class="btn btn--secondary modern-btn" onclick="clearETFForm()">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M3 6h18"/>
+                                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                                        </svg>
+                                        Clear
+                                    </button>
+                                    <button type="button" class="btn btn--outline modern-btn" onclick="loadETFSample()">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                            <polyline points="14,2 14,8 20,8"/>
+                                        </svg>
+                                        Load Sample
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="results-section">
+                    <div class="card modern-card results-card">
+                        <div class="card__body">
+                            <h3>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 17H7A5 5 0 0 1 7 7h2"/>
+                                    <path d="M15 7h2a5 5 0 1 1 0 10h-2"/>
+                                    <line x1="8" y1="12" x2="16" y2="12"/>
+                                </svg>
+                                ETF Calculation Results
+                            </h3>
+                            <div id="etf-results" class="results-container modern-results">
+                                <div class="results-placeholder modern-placeholder">
+                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M9 17H7A5 5 0 0 1 7 7h2"/>
+                                        <path d="M15 7h2a5 5 0 1 1 0 10h-2"/>
+                                        <line x1="8" y1="12" x2="16" y2="12"/>
+                                    </svg>
+                                    <p>Enter data and calculate to see results</p>
+                                </div>
+                            </div>
+                            <div id="etf-errors" class="error-container"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NPF Calculator Tab -->
+        <div class="tab-content" id="npf-tab">
+            <div class="calculator-grid">
+                <div class="input-section">
+                    <div class="card modern-card">
+                        <div class="card__body">
+                            <h3>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                    <polyline points="14,2 14,8 20,8"/>
+                                    <line x1="16" y1="13" x2="8" y2="13"/>
+                                    <line x1="16" y1="17" x2="8" y2="17"/>
+                                    <polyline points="10,9 9,9 8,9"/>
+                                </svg>
+                                NPF Calculation Input
+                            </h3>
+                            <form id="npf-form">
+                                <div class="form-group modern-form-group">
+                                    <label class="form-label modern-label" for="npf-agreed-date">Agreed Cease Date *</label>
+                                    <input type="date" id="npf-agreed-date" class="form-control modern-input" required>
+                                    <div class="input-border-effect"></div>
+                                </div>
+                                
+                                <div class="form-group modern-form-group">
+                                    <label class="form-label modern-label" for="npf-request-date">Request Received Date *</label>
+                                    <input type="date" id="npf-request-date" class="form-control modern-input" required>
+                                    <div class="input-border-effect"></div>
+                                </div>
+                                
+                                <div class="form-group modern-form-group">
+                                    <label class="form-label modern-label" for="npf-monthly-sell">Monthly Sell Amount (£) *</label>
+                                    <input type="number" id="npf-monthly-sell" class="form-control modern-input" step="0.01" min="0" required placeholder="0.00">
+                                    <div class="input-border-effect"></div>
+                                </div>
+                                
+                                <div class="form-actions modern-actions">
+                                    <button type="button" class="btn btn--primary modern-btn" onclick="calculateNPF()">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M9 11H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h4m6-6h8a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-8m-6-6v6m6-6v6"/>
+                                        </svg>
+                                        Calculate NPF
+                                    </button>
+                                    <button type="button" class="btn btn--secondary modern-btn" onclick="clearNPFForm()">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M3 6h18"/>
+                                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                                        </svg>
+                                        Clear
+                                    </button>
+                                    <button type="button" class="btn btn--outline modern-btn" onclick="loadNPFSample()">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                            <polyline points="14,2 14,8 20,8"/>
+                                        </svg>
+                                        Load Sample
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="results-section">
+                    <div class="card modern-card results-card">
+                        <div class="card__body">
+                            <h3>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 17H7A5 5 0 0 1 7 7h2"/>
+                                    <path d="M15 7h2a5 5 0 1 1 0 10h-2"/>
+                                    <line x1="8" y1="12" x2="16" y2="12"/>
+                                </svg>
+                                NPF Calculation Results
+                            </h3>
+                            <div id="npf-results" class="results-container modern-results">
+                                <div class="results-placeholder modern-placeholder">
+                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M9 17H7A5 5 0 0 1 7 7h2"/>
+                                        <path d="M15 7h2a5 5 0 1 1 0 10h-2"/>
+                                        <line x1="8" y1="12" x2="16" y2="12"/>
+                                    </svg>
+                                    <p>Enter data and calculate to see results</p>
+                                </div>
+                            </div>
+                            <div id="npf-errors" class="error-container"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success notification -->
+        <div id="success-notification" class="success-notification hidden">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20,6 9,17 4,12"/>
+            </svg>
+            <span>Calculation completed and saved!</span>
+        </div>
+
+        <!-- PWA Install Banner -->
+        <div id="install-banner" class="install-banner hidden">
+            <div class="install-content">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7,10 12,15 17,10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                <div>
+                    <h4>Install ETF Calculator</h4>
+                    <p>Install this app for easy access and offline use</p>
+                </div>
+                <div class="install-actions">
+                    <button id="install-btn" class="btn btn--primary btn--sm">Install</button>
+                    <button id="dismiss-install" class="btn btn--outline btn--sm">Later</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
