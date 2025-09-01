@@ -3,7 +3,7 @@
   "short_name": "ETF Calculator",
   "description": "Professional Early Termination Fee & Notice Period Fee Calculator with automatic record keeping and offline support",
   "version": "2.0.0",
-  "start_url": "./",
+  "start_url":"./index.html",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#FCFCF9",
