@@ -1,119 +1,87 @@
-const CACHE_NAME = 'etf-npf-calculator-v2';
-const urlsToCache = [
-  './',
-  'index.html',
-  'style.css',
-  'app.js',
-  'manifest.json',
-  'C:\Users\ajays\Downloads\etf-npf-calculator-pwa.zip\Logo.svg',
-  'background.jpg',
-  // Fallback for offline
+const CACHE_NAME = 'etf-calculator-v1.0.0';
+const ASSETS_TO_CACHE = [
+    './',
+    './index.html',
+    './style.css',
+    './app.js',
+    './logo.jpg'
+    // Removed background.jpg since it doesn't exist
 ];
 
 // Install event
-self.addEventListener('install', event => {
-  console.log('Service Worker installing...');
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Caching app shell files');
-        return cache.addAll(urlsToCache);
-      })
-      .catch(error => {
-        console.error('Cache failed:', error);
-      })
-  );
-  self.skipWaiting();
+self.addEventListener('install', (event) => {
+    console.log('Service Worker installing...');
+    event.waitUntil(
+        caches.open(CACHE_NAME)
+            .then((cache) => {
+                console.log('Service Worker caching assets');
+                return Promise.all(
+                    ASSETS_TO_CACHE.map(url => {
+                        return cache.add(url).catch(err => {
+                            console.warn('Failed to cache:', url, err);
+                            return Promise.resolve();
+                        });
+                    })
+                );
+            })
+            .catch((error) => {
+                console.error('Service Worker cache failed:', error);
+            })
+    );
+    self.skipWaiting();
 });
 
 // Activate event
-self.addEventListener('activate', event => {
-  console.log('Service Worker activating...');
-  event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
-  );
-  self.clients.claim();
-});
-
-// Fetch event
-self.addEventListener('fetch', event => {
-  // Skip cross-origin requests
-  if (!event.request.url.startsWith(self.location.origin)) {
-    return;
-  }
-
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Return cached version or fetch from network
-        if (response) {
-          console.log('Serving from cache:', event.request.url);
-          return response;
-        }
-
-        console.log('Fetching from network:', event.request.url);
-        return fetch(event.request)
-          .then(response => {
-            // Check if valid response
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-
-            // Clone the response
-            const responseToCache = response.clone();
-
-            caches.open(CACHE_NAME)
-              .then(cache => {
-                cache.put(event.request, responseToCache);
-              });
-
-            return response;
-          })
-          .catch(() => {
-            // Fallback for offline
-            if (event.request.destination === 'document') {
-              return caches.match('./index.html');
-            }
-          });
-      })
-  );
-});
-
-// Background sync for data persistence
-self.addEventListener('sync', event => {
-  if (event.tag === 'calculation-sync') {
+self.addEventListener('activate', (event) => {
+    console.log('Service Worker activating...');
     event.waitUntil(
-      // Handle background sync for calculations
-      console.log('Background sync: calculation-sync')
+        caches.keys().then((cacheNames) => {
+            return Promise.all(
+                cacheNames.map((cacheName) => {
+                    if (cacheName !== CACHE_NAME) {
+                        console.log('Service Worker deleting old cache:', cacheName);
+                        return caches.delete(cacheName);
+                    }
+                })
+            );
+        })
     );
-  }
+    return self.clients.claim();
 });
 
-// Push notifications support (framework)
-self.addEventListener('push', event => {
-  console.log('Push notification received');
+// Fetch event - Cache First Strategy
+self.addEventListener('fetch', (event) => {
+    event.respondWith(
+        caches.match(event.request)
+            .then((response) => {
+                if (response) {
+                    return response;
+                }
+                return fetch(event.request)
+                    .then((response) => {
+                        if (!response || response.status !== 200 || response.type !== 'basic') {
+                            return response;
+                        }
+                        const responseToCache = response.clone();
+                        caches.open(CACHE_NAME)
+                            .then((cache) => {
+                                cache.put(event.request, responseToCache);
+                            });
+                        return response;
+                    });
+            })
+            .catch(() => {
+                // Return cached fallback for navigation requests
+                if (event.request.destination === 'document') {
+                    return caches.match('./index.html');
+                }
+            })
+    );
+});
 
-  const options = {
-    body: event.data ? event.data.text() : 'New calculation available',
-    icon: './logo.jpg',
-    badge: './logo.jpg',
-    vibrate: [200, 100, 200],
-    data: {
-      dateOfArrival: Date.now(),
-      primaryKey: '2'
+// Message event for cache updates
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
     }
-  };
-
-  event.waitUntil(
-    self.registration.showNotification('ETF Calculator', options)
-  );
 });
